@@ -3,15 +3,15 @@ defmodule Advent do
 
   def load_input(filename) do
     filename
-    |> File.read!()
-    |> String.split("\n")
+    |> File.stream!()
+    # |> String.split("\n")
   end
 
   def run(problem, filename) do
     filename
     |> load_input()
-    |> Enum.map(fn f -> parse_line(problem, f) end)
-    |> Enum.sum()
+    |> Stream.map(fn f -> parse_line(problem, f) end)
+    |> Stream.sum()
     |> IO.puts()
   end
 
