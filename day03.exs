@@ -26,10 +26,6 @@ defmodule Advent do
           IO.puts(line)
           :skip
         {_, 0} ->
-          # pos = case rem(step * (right), String.length(line)) + 1 do
-          #   0 -> 31
-          #   p -> p
-          # end
           pos = rem(ceil(step / down) * (right), String.length(line)) + 1
 
           case String.at(line, pos - 1) do
