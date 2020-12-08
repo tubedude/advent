@@ -25,7 +25,7 @@ defmodule Advent do
   def calculate([], min, _max), do: min
 
   def calculate(chars, min, max) when is_list(chars) do
-    IO.puts("#{chars}:#{min}:#{max}")
+    # IO.puts("#{chars}:#{min}:#{max}")
     # FBLR = 70 66 76 82
     [h | t] = chars
     case h do
@@ -37,6 +37,24 @@ defmodule Advent do
 
   end
 
+  def find_seat(filename) do
+    filename
+    |> run()
+    |> Enum.sort()
+    |> check_availability()
+  end
+
+  def check_availability(seat_list) do
+    [ first | rem ] = seat_list
+    [ target | rem2 ] = rem
+    [ last | _rem ] = rem2
+    IO.puts("#{first}/#{target}/#{last}")
+    cond do
+      last - first == 2 -> check_availability(rem)
+      true -> target + 1
+    end
+  end
+
 
 end
 
@@ -44,4 +62,8 @@ Advent.find_id("FBFBBFFRLR") |> IO.puts()
 
 Advent.run("day05_input.txt")
 |> Enum.max()
+|> IO.puts()
+
+
+Advent.find_seat("day05_input.txt")
 |> IO.puts()
