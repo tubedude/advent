@@ -8,21 +8,32 @@ defmodule Advent do
     |> String.split(@entity_split)
   end
 
-  def run(filename) do
+  def run1(filename) do
     filename
     |> load_input()
     |> Enum.map(&replace_spaces/1)
     |> Enum.map(&split_fields/1)
-    |> Enum.map(&validate_passport/1)
+    |> Enum.map(&validate_passport1/1)
+    |> Enum.filter(fn {p, _, _} -> p == :valid end)
+    |> Enum.count()
+
+  end
+  def run2(filename) do
+    filename
+    |> load_input()
+    |> Enum.map(&replace_spaces/1)
+    |> Enum.map(&split_fields/1)
+    |> Enum.map(&validate_passport2/1)
     |> Enum.filter(fn {p, _, _} -> p == :valid end)
     |> Enum.count()
 
   end
 
+
   defp replace_spaces(entity) do
     e = entity
     |> String.replace("\n", " ")
-    IO.puts(e)
+    # IO.puts(e)
     e
   end
 
@@ -39,11 +50,21 @@ defmodule Advent do
     {pass, line}
   end
 
-  defp validate_passport({passport, line}) do
+  defp validate_passport2({passport, line}) do
     val = case passport do
       %{"byr" => _, "iyr" => _, "eyr" => _ , "hgt" => _, "hcl" => _, "ecl" => _, "pid" => _} = valid_pass->
         second_validation(valid_pass)
-        # :valid
+      _ ->
+        :missing_field
+    end
+    {val, passport, line}
+  end
+
+  defp validate_passport1({passport, line}) do
+    val = case passport do
+      %{"byr" => _, "iyr" => _, "eyr" => _ , "hgt" => _, "hcl" => _, "ecl" => _, "pid" => _} = _valid_pass->
+        # second_validation(valid_pass)
+        :valid
       _ ->
         :missing_field
     end
@@ -126,7 +147,7 @@ defp validate(passport, "ecl") do
 end
 # pid (Passport ID) - a nine-digit number, including leading zeroes.
 defp validate(passport, "pid") do
-  r = case Regex.match?(~r/\d{9}/  ,Map.get(passport, "pid")) do
+  r = case Regex.match?(~r/^\d{9}$/  ,Map.get(passport, "pid")) do
     true -> :ok
     false -> :bad_pid
   end
@@ -138,7 +159,7 @@ end
 
 
   defp validate_amount(type, val, min, max) do
-    if val >= min && val <= max do
+    if min <= val && val <= max do
       :ok
     else
       # IO.puts("Bad #{val} #{min}/#{max}")
@@ -147,14 +168,20 @@ end
   end
 
   # If cm, the number must be at least 150 and at most 193.
-  defp validate_height(val, "cm"), do: validate_amount(:hgt, val, 150, 193)
+  defp validate_height(val, "cm"), do: validate_amount(:hgt_cm, val, 150, 193)
   # If in, the number must be at least 59 and at most 76.
-  defp validate_height(val, "in"), do: validate_amount(:hgt, val,  59,  76)
+  defp validate_height(val, "in"), do: validate_amount(:hgt_in, val,  59,  76)
 
 end
 
 
-Advent.run("day04_input.txt")
+Advent.run1("day04_input.txt")
+# |>Enum.dedup()
+# |> Enum.map(fn {val, _p, l} -> IO.puts("#{val} \t\t #{inspect(l)}") end)
+|> IO.puts()
+
+
+Advent.run2("day04_input.txt")
 # |>Enum.dedup()
 # |> Enum.map(fn {val, _p, l} -> IO.puts("#{val} \t\t #{inspect(l)}") end)
 |> IO.puts()
